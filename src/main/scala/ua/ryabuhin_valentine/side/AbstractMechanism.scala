@@ -7,7 +7,7 @@ import java.io._;
 trait AbstractMechanism {
 	val scanner = new Scanner(System.in);
 	
-	def communication(socket: Socket) {
+	def communication(socket: Socket): Unit = {
 		val ins = new DataInputStream(socket.getInputStream);
 		val outs = new DataOutputStream(socket.getOutputStream);
 		val clientAddr = socket.getInetAddress;
