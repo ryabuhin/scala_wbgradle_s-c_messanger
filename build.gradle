@@ -1,0 +1,19 @@
+apply plugin: 'scala'
+apply plugin: 'java'
+
+repositories {
+	mavenCentral()
+	jcenter()
+}
+
+dependencies {
+	compile 'org.scala-lang:scala-library:2.11.8'
+	compile 'org.slf4j:slf4j-api:1.7.22'
+	testCompile 'junit:junit:4.12'
+}
+
+task run(type: JavaExec, dependsOn: classes) {
+    main = 'ua.ryabuhin_valentine.main.Main'
+    classpath sourceSets.main.runtimeClasspath
+    classpath configurations.runtime
+}
