@@ -1,8 +1,7 @@
-package ua.ryabuhin_valentine.main;
+package ua.ryabuhin_valentine.view;
 
+import ua.ryabuhin_valentine.presenter.Presenter;
 import java.util._;
-import ua.ryabuhin_valentine.side.server.MyScalaServer;
-import ua.ryabuhin_valentine.side.client.MyScalaClient;
 import javafx.application.Application;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
@@ -13,16 +12,18 @@ import javafx.scene.layout._;
 import javafx.event.EventHandler;
 import javafx.event.Event;
 
-object Main {
-	def main(args: Array[String]) {
-		Application.launch(classOf[Main], args: _*);
-	}
-	var primaryStage: Stage = null;
+object View {
+	def main(args: Array[String]) = Application.launch(classOf[View], args: _*);
 }
 
-class Main extends Application {
+class View extends Application {
+	var presenter: Presenter = null;
+	var primaryStage: Stage = null;
+	var textArea: TextArea = null;
+	var textField: TextField = null;
+	
 	override def start(primaryStage: Stage): Unit = {
-		Main.primaryStage = primaryStage;
+		this.primaryStage = primaryStage;
 		var pane = new BorderPane;
 		pane.setPrefSize(600, 500);
 		pane.setCenter(initMainMenu);
@@ -34,17 +35,11 @@ class Main extends Application {
 	def initMainMenu: VBox = {
 		var bServer:Button = initButton("Server");
 		bServer.setOnMouseClicked(new EventHandler[Event] {
-			override def handle(e: Event): Unit = {
-				Main.primaryStage.setScene(initChatMenu);
-				//new MyScalaServer(8987).start;
-			}
+			override def handle(e: Event): Unit = communication(true, 8981);
 		});
 		var bClient = initButton("Client");
 		bClient.setOnMouseClicked(new EventHandler[Event] {
-			override def handle(e: Event): Unit = {
-				Main.primaryStage.setScene(initChatMenu);
-				//new MyScalaClient("localhost", 8987).start;
-			}
+			override def handle(e: Event): Unit = communication(false, 8981, "localhost");
 		});
 		var vboxMainMenu = new VBox(10);
 		vboxMainMenu.setAlignment(javafx.geometry.Pos.CENTER);
@@ -58,12 +53,15 @@ class Main extends Application {
 		vbox.setTranslateX(20);
 		vbox.setTranslateY(20);
 		var bSend = initButton("Send message");
-		var textField = new TextField();
+		bSend.setOnMouseClicked(new EventHandler[Event] {
+			override def handle(event: Event): Unit = presenter.sentMessage(textField.getText);
+		});
+		textField = new TextField();
 		textField.setPrefSize(340, 50);
 		var hbox = new HBox(20);
 		hbox.getChildren.addAll(textField, bSend);
 		var paneArea = new Pane;
-		var textArea = new TextArea();
+		textArea = new TextArea();
 		textArea.setPrefSize(560, 400);
 		textArea.setWrapText(true);
 		textArea.setEditable(false);
@@ -77,6 +75,17 @@ class Main extends Application {
 		var button:Button = new Button(bName);
 		button.setPrefSize(200, 50);
 		button;
+	}
+	def communication(isServer: Boolean, port: Integer, ip: String = ""):Unit = {
+		primaryStage.setScene(initChatMenu);
+		presenter = new Presenter(View.this);
+		presenter.initModel(isServer, 8987, ip);
+		new Thread() {
+			override def run {
+				while(true)
+					textArea.appendText("\n" + presenter.receiveMessage());
+			}
+		}.start();
 	}
 }
 
