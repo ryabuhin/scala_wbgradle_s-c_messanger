@@ -1,7 +1,6 @@
 package ua.ryabuhin_valentine.view;
 
 import ua.ryabuhin_valentine.presenter.Presenter;
-import java.util._;
 import javafx.application.Application;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
@@ -32,6 +31,7 @@ class View extends Application {
 		primaryStage.setTitle("Scala custom chat v1.0");
 		primaryStage.show;
 	}
+	
 	def initMainMenu: VBox = {
 		var bServer:Button = initButton("Server");
 		bServer.setOnMouseClicked(new EventHandler[Event] {
@@ -46,6 +46,7 @@ class View extends Application {
 		vboxMainMenu.getChildren.addAll(bServer, bClient);
 		vboxMainMenu;
 	}
+	
 	def initChatMenu: Scene = {
 		var pane = new Pane;
 		var vbox = new VBox(20);
@@ -54,7 +55,12 @@ class View extends Application {
 		vbox.setTranslateY(20);
 		var bSend = initButton("Send message");
 		bSend.setOnMouseClicked(new EventHandler[Event] {
-			override def handle(event: Event): Unit = presenter.sentMessage(textField.getText);
+			override def handle(event: Event): Unit = {
+				val message = textField.getText;
+				presenter.sentMessage(message);
+				textArea.appendText("\n( You ): " + message);
+				textField.setText("");
+			}
 		});
 		textField = new TextField();
 		textField.setPrefSize(340, 50);
@@ -71,21 +77,22 @@ class View extends Application {
 		pane.getChildren.add(vbox);
 		new Scene(pane);
 	}
+	
 	def initButton(bName: String):Button = {
 		var button:Button = new Button(bName);
 		button.setPrefSize(200, 50);
 		button;
 	}
+	
 	def communication(isServer: Boolean, port: Integer, ip: String = ""):Unit = {
 		primaryStage.setScene(initChatMenu);
 		presenter = new Presenter(View.this);
 		presenter.initModel(isServer, 8987, ip);
 		new Thread() {
-			override def run {
+			override def run: Unit = {
 				while(true)
 					textArea.appendText("\n" + presenter.receiveMessage());
 			}
 		}.start();
 	}
 }
-

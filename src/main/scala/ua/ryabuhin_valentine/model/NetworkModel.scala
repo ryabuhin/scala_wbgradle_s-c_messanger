@@ -1,7 +1,6 @@
 package ua.ryabuhin_valentine.model;
 
 import java.net._;
-import java.io._;
 
 class NetworkModel(private val _isServer: Boolean, private val _port: Int, private val _ip: String = "") {
 	private var _serverSocket = if (_isServer) new ServerSocket(_port) else null;

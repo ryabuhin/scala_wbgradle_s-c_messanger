@@ -2,8 +2,6 @@ package ua.ryabuhin_valentine.presenter
 
 import ua.ryabuhin_valentine.view.View;
 import ua.ryabuhin_valentine.model.NetworkModel;
-import java.util._
-import java.net._
 import java.io._;
 
 class Presenter(private val view: View) {
