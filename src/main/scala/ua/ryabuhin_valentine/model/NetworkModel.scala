@@ -8,4 +8,5 @@ class NetworkModel(private val _isServer: Boolean, private val _port: Int, priva
 	
 	def isServer: Boolean = _isServer;
 	def applySocket: Socket = _applySocket;
+	def serverSocket: ServerSocket = _serverSocket;
 }
